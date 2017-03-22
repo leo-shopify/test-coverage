@@ -1,0 +1,109 @@
+* Testing private functionality or not?
+
+** index.js
+#+begin_src js
+  const tag = (t, val) => `<${t}>${val}</${t}>`;
+
+  const ratingToString = rating => {
+      if (rating > 0) return 'good';
+      else if (rating < 0) return 'bad';
+      return 'ugly';
+  };
+
+  const MID = 3;
+
+  const normalize = rating => rating - MID;
+
+  const wrap = (t, rating) => tag(t, ratingToString(normalize(rating)));
+
+  const a = rating => wrap('a', rating);
+
+  const b = rating => wrap('b', rating);
+
+  const c = rating => wrap('c', rating);
+
+  module.exports = { tag, ratingToString, normalize, a, b, c };
+#+end_src
+
+** test/minimum.js
+#+begin_src js
+  const tap = require('tap');
+  const Module = require('../');
+  const a = Module.a;
+  const b = Module.b;
+  const c = Module.c;
+
+  tap.ok(a(5) === '<a>good</a>');
+  tap.ok(b(3) === '<b>ugly</b>');
+  tap.ok(c(0) === '<c>bad</c>');
+#+end_src
+
+** test/private.js
+#+begin_src js
+  const tap = require('tap');
+  const Module = require('../');
+  const tag = Module.tag;
+  const ratingToString = Module.ratingToString;
+  const normalize = Module.normalize;
+  const a = Module.a;
+  const b = Module.b;
+  const c = Module.c;
+
+  tap.ok(tag('span', 'any text'));
+
+  tap.ok(normalize(0) === -3);
+  tap.ok(normalize(1) === -2);
+  tap.ok(normalize(2) === -1);
+  tap.ok(normalize(3) ===  0);
+  tap.ok(normalize(4) ===  1);
+  tap.ok(normalize(5) ===  2);
+
+  tap.ok(ratingToString(1) === 'good');
+  tap.ok(ratingToString(0) === 'ugly');
+  tap.ok(ratingToString(-1) === 'bad');
+
+  tap.ok(a(5) === '<a>good</a>');
+  tap.ok(b(1) === '<b>bad</b>');
+  tap.ok(c(3) === '<c>ugly</c>');
+#+end_src
+
+** test/public.js
+#+begin_src js
+  const tap = require('tap');
+  const Module = require('../');
+  const a = Module.a;
+  const b = Module.b;
+  const c = Module.c;
+
+  tap.ok(a(5) === '<a>good</a>');
+  tap.ok(a(4) === '<a>good</a>');
+  tap.ok(a(3) === '<a>ugly</a>');
+  tap.ok(a(2) === '<a>bad</a>');
+  tap.ok(a(1) === '<a>bad</a>');
+  tap.ok(a(0) === '<a>bad</a>');
+
+  tap.ok(b(5) === '<b>good</b>');
+  tap.ok(b(4) === '<b>good</b>');
+  tap.ok(b(3) === '<b>ugly</b>');
+  tap.ok(b(2) === '<b>bad</b>');
+  tap.ok(b(1) === '<b>bad</b>');
+  tap.ok(b(0) === '<b>bad</b>');
+
+  tap.ok(c(5) === '<c>good</c>');
+  tap.ok(c(4) === '<c>good</c>');
+  tap.ok(c(3) === '<c>ugly</c>');
+  tap.ok(c(2) === '<c>bad</c>');
+  tap.ok(c(1) === '<c>bad</c>');
+  tap.ok(c(0) === '<c>bad</c>');
+#+end_src
+
+** Installing and running
+#+begin_src sh
+  yarn install
+#+end_src
+
+#+begin_src sh
+  yarn test -- test/minimum.js
+  yarn test -- test/private.js
+  yarn test -- test/public.js
+#+end_src

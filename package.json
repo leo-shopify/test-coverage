@@ -1,0 +1,13 @@
+{
+  "name": "test-coverage",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "GPL-3.0",
+  "author": "Leonardo Rojas <leonardo.rojas@shopify.com>",
+  "dependencies": {
+    "tap": "^10.3.0"
+  },
+  "scripts": {
+    "test": "tap --coverage --reporter=spec"
+  }
+}
